@@ -1,10 +1,10 @@
 // The shared equipment store. Everyone takes and returns; the coordinator also manages the items.
 import { useState, type FormEvent } from 'react'
-import { ApiError } from '../api/client'
 import * as endpoints from '../api/endpoints'
 import type { EquipmentDto, EquipmentStatus } from '../api/types'
 import { useAuth } from '../auth/AuthContext'
-import { Projector } from '../components/Art'
+import { ArtTile, Icon } from '../components/Art'
+import { ChipGroup, Switch } from '../components/Controls'
 import { useFeedback } from '../components/Feedback'
 import { EmptyState, ErrorBox, Field, Loader, Modal, PageHeader } from '../components/ui'
 import { equipmentStatusLabel, formatDateTime } from '../utils/format'
@@ -23,15 +23,14 @@ export function Equipment() {
     try {
       if (action === 'take') {
         await endpoints.takeEquipment(item.id)
-        toast(`${item.name} אצלך עכשיו 🎉`)
+        toast(`${item.name} אצלך עכשיו`)
       } else {
         await endpoints.returnEquipment(item.id)
         toast(`${item.name} הוחזר למחסן`)
       }
     } catch (e) {
       // 409 on take = someone else was faster (or the item is not available any more)
-      const text = e instanceof ApiError && e.status === 409 ? `${errorText(e)} 🏃‍♀️` : errorText(e)
-      toast(text, 'error')
+      toast(errorText(e), 'error')
     } finally {
       setBusyId(null)
       void reload()
@@ -56,22 +55,29 @@ export function Equipment() {
         theme="equipment"
         title="מחסן ציוד"
         subtitle="לוקחים בלחיצה ומחזירים בלחיצה. אם שתיים לוחצות יחד, רק אחת מקבלת."
-        art={<Projector size={56} />}
+        eyebrow="ציוד"
+        art={<ArtTile icon="box" size={72} />}
         actions={
           isCoordinator && (
             <button className="btn btn-primary" onClick={() => setEditing('new')}>
-              ＋ פריט חדש
+              <Icon name="plus" size={18} /> פריט חדש
             </button>
           )
         }
       />
 
-      <div className="segmented">
-        {(['', 'Available', 'Taken', 'Maintenance'] as const).map((s) => (
-          <button key={s || 'all'} className={status === s ? 'active' : ''} onClick={() => setStatus(s)}>
-            {s ? equipmentStatusLabel[s] : 'הכול'}
-          </button>
-        ))}
+      <div className="toolbar">
+        <ChipGroup<EquipmentStatus | ''>
+          ariaLabel="סינון לפי מצב"
+          value={status}
+          onChange={setStatus}
+          options={[
+            { value: '', label: 'הכול', icon: <Icon name="layers" size={16} /> },
+            { value: 'Available', label: equipmentStatusLabel.Available, icon: <Icon name="check" size={16} /> },
+            { value: 'Taken', label: equipmentStatusLabel.Taken, icon: <Icon name="clock" size={16} /> },
+            { value: 'Maintenance', label: equipmentStatusLabel.Maintenance, icon: <Icon name="wrench" size={16} /> },
+          ]}
+        />
       </div>
 
       {loading && !data ? (
@@ -79,7 +85,7 @@ export function Equipment() {
       ) : error || !data ? (
         <ErrorBox message={error ?? ''} onRetry={reload} />
       ) : data.length === 0 ? (
-        <EmptyState art={<Projector size={80} />} title="אין פריטים להצגה" text={isCoordinator ? 'הוסיפי את הפריט הראשון למחסן.' : undefined} />
+        <EmptyState art={<ArtTile icon="box" size={76} />} title="אין פריטים להצגה" text={isCoordinator ? 'הוסיפי את הפריט הראשון למחסן.' : undefined} />
       ) : (
         <div className="equipment-grid">
           {data.map((item, i) => {
@@ -87,7 +93,9 @@ export function Equipment() {
             return (
               <div key={item.id} className={`equipment-card status-${item.status}`} style={{ animationDelay: `${i * 70}ms` }}>
                 <div className="equipment-art">
-                  <Projector size={64} />
+                  <span className="equipment-icon">
+                    <Icon name={item.status === 'Maintenance' ? 'wrench' : 'box'} size={30} strokeWidth={1.6} />
+                  </span>
                   <span className={`status-pill pill-${item.status}`}>{equipmentStatusLabel[item.status]}</span>
                 </div>
                 <h3>{item.name}</h3>
@@ -112,10 +120,10 @@ export function Equipment() {
                   {isCoordinator && (
                     <div className="equipment-admin">
                       <button className="btn btn-ghost btn-small" onClick={() => setEditing(item)}>
-                        ✏️ עריכה
+                        <Icon name="edit" size={15} /> עריכה
                       </button>
                       <button className="btn btn-danger-ghost btn-small" onClick={() => remove(item)}>
-                        🗑️ מחיקה
+                        <Icon name="trash" size={15} /> מחיקה
                       </button>
                     </div>
                   )}
@@ -169,11 +177,13 @@ function EquipmentEditor({ item, onClose, onSaved }: { item?: EquipmentDto; onCl
           <textarea value={description} onChange={(e) => setDescription(e.target.value)} maxLength={500} rows={2} />
         </Field>
         {item && (
-          <label className="check">
-            <input type="checkbox" checked={maintenance} onChange={(e) => setMaintenance(e.target.checked)} disabled={item.status === 'Taken'} />
-            בתיקון (לא זמין להשאלה)
-            {item.status === 'Taken' && <span className="muted small"> · אפשר אחרי שהפריט יוחזר</span>}
-          </label>
+          <Switch
+            checked={maintenance}
+            onChange={setMaintenance}
+            disabled={item.status === 'Taken'}
+            label="בתיקון (לא זמין להשאלה)"
+            hint={item.status === 'Taken' ? 'אפשר אחרי שהפריט יוחזר' : undefined}
+          />
         )}
         {error && <div className="form-error">{error}</div>}
         <div className="modal-actions">

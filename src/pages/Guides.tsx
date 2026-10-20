@@ -4,10 +4,11 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ApiError } from '../api/client'
 import * as endpoints from '../api/endpoints'
 import type { UserDto } from '../api/types'
-import { Chair, Group, Wallet } from '../components/Art'
+import { ArtTile, Icon } from '../components/Art'
+import { Select } from '../components/Controls'
 import { GuideEditor } from '../components/Editors'
 import { useFeedback } from '../components/Feedback'
-import { MeetingCards } from '../components/Showcase'
+import { MeetingFlow } from '../components/Showcase'
 import { EmptyState, ErrorBox, Loader, PageHeader, Pager, PotCard, Reveal } from '../components/ui'
 import { formatDate } from '../utils/format'
 import { errorText, useLoad } from '../utils/useLoad'
@@ -49,30 +50,32 @@ export function Guides() {
         theme="guides"
         title="המדריכות"
         subtitle="הוספה, עריכה ומחיקה של מדריכות. לחצי על מדריכה כדי לראות את כל מה ששלה."
-        art={<Group size={56} />}
+        eyebrow="צוות"
+        art={<ArtTile icon="user" size={72} />}
         actions={
           <button className="btn btn-primary" onClick={() => setEditing('new')}>
-            ＋ מדריכה חדשה
+            <Icon name="plus" size={18} /> מדריכה חדשה
           </button>
         }
       />
 
       <div className="toolbar">
-        <label className="inline-field">
-          מיון:
-          <select
-            value={sort}
-            onChange={(e) => {
-              setSort(e.target.value)
-              setPage(1)
-            }}
-          >
-            <option value="name_asc">שם (א-ת)</option>
-            <option value="name_desc">שם (ת-א)</option>
-            <option value="created_desc">הצטרפה לאחרונה</option>
-            <option value="created_asc">הצטרפה ראשונה</option>
-          </select>
-        </label>
+        <Select<string>
+          ariaLabel="מיון"
+          className="select-inline"
+          value={sort}
+          icon={<Icon name="sort" size={16} />}
+          onChange={(v) => {
+            setSort(v)
+            setPage(1)
+          }}
+          options={[
+            { value: 'name_asc', label: 'שם (א-ת)' },
+            { value: 'name_desc', label: 'שם (ת-א)' },
+            { value: 'created_desc', label: 'הצטרפה לאחרונה' },
+            { value: 'created_asc', label: 'הצטרפה ראשונה' },
+          ]}
+        />
         {data && <span className="muted">{data.totalCount} מדריכות</span>}
       </div>
 
@@ -82,7 +85,7 @@ export function Guides() {
         <ErrorBox message={error ?? ''} onRetry={reload} />
       ) : data.items.length === 0 ? (
         <EmptyState
-          art={<Group size={80} />}
+          art={<ArtTile icon="user" size={76} />}
           title="עוד אין מדריכות"
           text="הוסיפי את המדריכה הראשונה, והיא תוכל להתחבר עם האימייל והסיסמה שתבחרי."
           action={
@@ -103,18 +106,20 @@ export function Guides() {
                     <span className="muted small d-block" dir="ltr">
                       {g.email}
                     </span>
-                    <span className="muted small d-block">📞 {g.phone}</span>
+                    <span className="muted small d-block" dir="ltr">
+                      {g.phone}
+                    </span>
                   </span>
                 </button>
                 <div className="person-actions">
                   <button className="btn btn-ghost btn-small" onClick={() => navigate(`/guides/${g.id}`)}>
-                    👁️ לדף שלה
+                    <Icon name="eye" size={15} /> לדף שלה
                   </button>
                   <button className="btn btn-ghost btn-small" onClick={() => setEditing(g)}>
-                    ✏️ עריכה
+                    <Icon name="edit" size={15} /> עריכה
                   </button>
                   <button className="btn btn-danger-ghost btn-small" onClick={() => remove(g)}>
-                    🗑️ מחיקה
+                    <Icon name="trash" size={15} /> מחיקה
                   </button>
                 </div>
               </div>
@@ -143,7 +148,7 @@ export function GuidePage() {
   return (
     <div className="page theme-guides">
       <Link to="/guides" className="back-link">
-        → חזרה לכל המדריכות
+        <Icon name="arrowRight" size={16} /> חזרה לכל המדריכות
       </Link>
 
       <div className="profile-hero">
@@ -151,22 +156,22 @@ export function GuidePage() {
         <div>
           <h1>{guide.fullName}</h1>
           <p className="muted">
-            <span dir="ltr">{guide.email}</span> · 📞 {guide.phone} · הצטרפה ב-{formatDate(guide.createdAt)}
+            <span dir="ltr">{guide.email}</span> · <span dir="ltr">{guide.phone}</span> · הצטרפה ב-{formatDate(guide.createdAt)}
           </p>
         </div>
         <div className="profile-actions">
           <button className="btn btn-ghost" onClick={() => setEditing(true)}>
-            ✏️ עריכת פרטים
+            <Icon name="edit" size={16} /> עריכת פרטים
           </button>
           <Link to={`/additions?guideId=${guide.id}`} className="btn btn-primary">
-            💰 תוספת תקציב
+            <Icon name="coins" size={16} /> תוספת תקציב
           </Link>
         </div>
       </div>
 
       <Reveal>
         <h2 className="section-title">
-          <Wallet size={32} /> הקופות שלה
+          <Icon name="wallet" size={22} /> הקופות שלה
         </h2>
         <div className="pots">
           {pots.map((pot, i) => (
@@ -178,24 +183,24 @@ export function GuidePage() {
       <Reveal>
         <div className="section-head">
           <h2 className="section-title">
-            <Chair size={32} /> המפגשים שלה
+            <Icon name="calendar" size={22} /> המפגשים שלה
           </h2>
           {recentMeetings.totalCount > recentMeetings.items.length && (
             <Link to={`/meetings?userId=${guide.id}`} className="btn btn-ghost btn-small">
-              לכל {recentMeetings.totalCount} המפגשים ←
+              לכל {recentMeetings.totalCount} המפגשים <Icon name="arrowLeft" size={15} />
             </Link>
           )}
         </div>
         {recentMeetings.items.length ? (
-          <MeetingCards meetings={recentMeetings.items} />
+          <MeetingFlow meetings={recentMeetings.items} />
         ) : (
-          <EmptyState art={<Chair size={64} />} title="עוד לא דווחו מפגשים" />
+          <EmptyState art={<ArtTile icon="calendar" size={64} />} title="עוד לא דווחו מפגשים" />
         )}
       </Reveal>
 
       <Reveal>
         <h2 className="section-title">
-          <Group size={32} /> החניכות שלה
+          <Icon name="users" size={22} /> החניכות שלה
         </h2>
         <ParticipantsSection guideId={guide.id} />
       </Reveal>

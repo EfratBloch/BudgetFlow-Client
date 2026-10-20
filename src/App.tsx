@@ -1,6 +1,6 @@
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthContext'
-import { Chair } from './components/Art'
+import { ArtTile } from './components/Art'
 import { FeedbackProvider } from './components/Feedback'
 import { Layout, RequireAuth } from './components/Layout'
 import { EmptyState } from './components/ui'
@@ -18,9 +18,9 @@ function NotFound() {
   return (
     <div className="page">
       <EmptyState
-        art={<Chair size={90} />}
+        art={<ArtTile icon="search" size={84} />}
         title="הדף לא נמצא"
-        text="כנראה שהכיסא הזה ריק. בואי נחזור הביתה."
+        text="הכתובת הזו לא קיימת. בואי נחזור לדף הבית."
         action={
           <Link to="/" className="btn btn-primary">
             לדף הבית
@@ -55,6 +55,7 @@ export default function App() {
               <Route element={<RequireAuth coordinatorOnly />}>
                 <Route path="/guides" element={<Guides />} />
                 <Route path="/guides/:id" element={<GuidePage />} />
+                <Route path="/guide-meetings" element={<MeetingsList scope="guides" />} />
                 <Route path="/additions" element={<Additions />} />
                 <Route path="/branch-participants" element={<BranchParticipants />} />
               </Route>

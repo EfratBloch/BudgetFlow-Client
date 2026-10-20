@@ -3,10 +3,11 @@ import { useState, type FormEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import * as endpoints from '../api/endpoints'
 import type { BudgetAdditionDto, BudgetAdditionKind, BudgetSource } from '../api/types'
-import { Wallet } from '../components/Art'
+import { ArtTile, Icon } from '../components/Art'
+import { ChipGroup, Select } from '../components/Controls'
 import { useFeedback } from '../components/Feedback'
 import { EmptyState, ErrorBox, Field, Loader, PageHeader, PotCard } from '../components/ui'
-import { formatDate, formatMoney, potLabel } from '../utils/format'
+import { formatDate, formatMoney, potIcon, potLabel } from '../utils/format'
 import { errorText, useLoad } from '../utils/useLoad'
 
 export function Additions() {
@@ -45,7 +46,7 @@ export function Additions() {
         reason: reason.trim(),
         fromPot: kind === 'Transfer' ? fromPot : undefined,
       })
-      toast('התוספת נשמרה 💰')
+      toast('התוספת נשמרה')
       setAmount('')
       setReason('')
       refresh()
@@ -75,7 +76,7 @@ export function Additions() {
 
   return (
     <div className="page theme-additions">
-      <PageHeader theme="additions" title="תוספות תקציב" subtitle="הוספת כסף לקופה של מדריכה: כסף חדש, או העברה מהקופות שלך" art={<Wallet size={56} />} />
+      <PageHeader theme="additions" title="תוספות תקציב" subtitle="הוספת כסף לקופה של מדריכה: כסף חדש, או העברה מהקופות שלך" eyebrow="תקציב" art={<ArtTile icon="coins" size={72} />} />
 
       {summary.data && (
         <div className="pots pots-compact">
@@ -87,43 +88,57 @@ export function Additions() {
 
       <div className="two-columns">
         <form className="card form" onSubmit={submit}>
-          <h3>➕ תוספת חדשה</h3>
+          <h3>
+            <Icon name="plus" size={20} /> תוספת חדשה
+          </h3>
           <Field label="למי?">
-            <select value={guideId} onChange={(e) => setGuideId(e.target.value ? Number(e.target.value) : '')} required>
-              <option value="">בחרי מדריכה</option>
-              {guides.data?.items.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.fullName}
-                </option>
-              ))}
-            </select>
+            <Select<number>
+              required
+              placeholder="בחרי מדריכה"
+              value={guideId}
+              onChange={setGuideId}
+              icon={<Icon name="user" size={16} />}
+              options={guides.data?.items.map((g) => ({ value: g.id, label: g.fullName })) ?? []}
+            />
           </Field>
 
-          <div className="segmented segmented-full">
-            <button type="button" className={kind === 'Extra' ? 'active' : ''} onClick={() => setKind('Extra')}>
-              ✨ כסף חדש
-            </button>
-            <button type="button" className={kind === 'Transfer' ? 'active' : ''} onClick={() => setKind('Transfer')}>
-              🔁 העברה מהקופות שלי
-            </button>
-          </div>
+          <ChipGroup<BudgetAdditionKind>
+            ariaLabel="סוג התוספת"
+            full
+            value={kind}
+            onChange={setKind}
+            options={[
+              { value: 'Extra', label: 'כסף חדש', icon: <Icon name="sparkle" size={17} /> },
+              { value: 'Transfer', label: 'העברה מהקופות שלי', icon: <Icon name="transfer" size={17} /> },
+            ]}
+          />
 
-          <div className="form-row">
-            <Field label="לאיזו קופה שלה?">
-              <select value={targetPot} onChange={(e) => setTargetPot(e.target.value as BudgetSource)}>
-                <option value="Activity">{potLabel.Activity}</option>
-                <option value="Birthday">{potLabel.Birthday}</option>
-              </select>
+          <Field label="לאיזו קופה שלה?" group>
+            <ChipGroup<BudgetSource>
+              ariaLabel="לאיזו קופה שלה"
+              full
+              value={targetPot}
+              onChange={setTargetPot}
+              options={[
+                { value: 'Activity', label: potLabel.Activity, icon: <Icon name={potIcon.Activity} size={17} /> },
+                { value: 'Birthday', label: potLabel.Birthday, icon: <Icon name={potIcon.Birthday} size={17} /> },
+              ]}
+            />
+          </Field>
+          {kind === 'Transfer' && (
+            <Field label="מאיזו קופה שלי?" group>
+              <ChipGroup<BudgetSource>
+                ariaLabel="מאיזו קופה שלי"
+                full
+                value={fromPot}
+                onChange={setFromPot}
+                options={[
+                  { value: 'Annual', label: potLabel.Annual, icon: <Icon name={potIcon.Annual} size={17} /> },
+                  { value: 'GuideMeetings', label: potLabel.GuideMeetings, icon: <Icon name={potIcon.GuideMeetings} size={17} /> },
+                ]}
+              />
             </Field>
-            {kind === 'Transfer' && (
-              <Field label="מאיזו קופה שלי?">
-                <select value={fromPot} onChange={(e) => setFromPot(e.target.value as BudgetSource)}>
-                  <option value="Annual">{potLabel.Annual}</option>
-                  <option value="GuideMeetings">{potLabel.GuideMeetings}</option>
-                </select>
-              </Field>
-            )}
-          </div>
+          )}
 
           <div className="form-row">
             <Field label="סכום (₪)">
@@ -142,19 +157,17 @@ export function Additions() {
 
         <div className="card">
           <div className="form-block-head">
-            <h3>📜 תוספות שניתנו</h3>
-            <select
-              value={filterGuide ?? ''}
-              onChange={(e) => setParams(e.target.value ? { guideId: e.target.value } : {})}
-              aria-label="סינון לפי מדריכה"
-            >
-              <option value="">כל המדריכות</option>
-              {guides.data?.items.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.fullName}
-                </option>
-              ))}
-            </select>
+            <h3>
+              <Icon name="list" size={20} /> תוספות שניתנו
+            </h3>
+            <Select<number>
+              ariaLabel="סינון לפי מדריכה"
+              className="select-inline"
+              value={filterGuide ?? 0}
+              onChange={(v) => setParams(v ? { guideId: String(v) } : {})}
+              icon={<Icon name="user" size={16} />}
+              options={[{ value: 0, label: 'כל המדריכות' }, ...(guides.data?.items.map((g) => ({ value: g.id, label: g.fullName })) ?? [])]}
+            />
           </div>
           {list.loading ? (
             <Loader />
@@ -166,7 +179,9 @@ export function Additions() {
             <ul className="additions">
               {list.data.map((a) => (
                 <li key={a.id} className="addition">
-                  <span className={`addition-icon ${a.kind === 'Extra' ? 'extra' : 'transfer'}`}>{a.kind === 'Extra' ? '✨' : '🔁'}</span>
+                  <span className={`addition-icon ${a.kind === 'Extra' ? 'extra' : 'transfer'}`}>
+                    <Icon name={a.kind === 'Extra' ? 'sparkle' : 'transfer'} size={18} />
+                  </span>
                   <div className="addition-text">
                     <strong>
                       {formatMoney(a.amount)} ל{potLabel[a.targetPot]} של {a.guideName}

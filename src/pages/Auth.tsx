@@ -1,5 +1,5 @@
 // Login and the one-time coordinator registration.
-import { useState, type FormEvent } from 'react'
+import { useState, type FocusEvent, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import * as endpoints from '../api/endpoints'
 import { useAuth } from '../auth/AuthContext'
@@ -7,6 +7,10 @@ import { Logo } from '../components/Art'
 import { useFeedback } from '../components/Feedback'
 import { Field } from '../components/ui'
 import { errorText } from '../utils/useLoad'
+
+// Fields open read-only and unlock on focus, so the browser never fills in a previous user's details
+const unlock = (e: FocusEvent<HTMLInputElement>) => e.currentTarget.removeAttribute('readonly')
+const fresh = { readOnly: true, onFocus: unlock, autoComplete: 'off' } as const
 
 export function Login() {
   const { session, login } = useAuth()
@@ -36,17 +40,17 @@ export function Login() {
 
   return (
     <div className="auth-page">
-      <form className="auth-card" onSubmit={submit}>
+      <form className="auth-card" onSubmit={submit} autoComplete="off">
         <div className="auth-logo">
           <Logo size={64} />
         </div>
         <h1>שמחות לראות אותך!</h1>
         <p className="muted">התחברי עם האימייל והסיסמה שלך</p>
         <Field label="אימייל">
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus dir="ltr" />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required dir="ltr" {...fresh} />
         </Field>
         <Field label="סיסמה">
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required dir="ltr" />
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required dir="ltr" {...fresh} autoComplete="new-password" />
         </Field>
         {error && <div className="form-error">{error}</div>}
         <button className="btn btn-primary btn-block" disabled={busy}>
@@ -64,7 +68,7 @@ export function Register() {
   const { session } = useAuth()
   const navigate = useNavigate()
   const { toast } = useFeedback()
-  const [form, setForm] = useState({ fullName: '', email: '', phone: '', nationalId: '', password: '' })
+  const [form, setForm] = useState({ fullName: '', email: '', phone: '', password: '' })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -81,7 +85,6 @@ export function Register() {
         fullName: form.fullName.trim(),
         email: form.email.trim(),
         phone: form.phone.trim(),
-        nationalId: form.nationalId.trim(),
         password: form.password,
       })
       toast('נרשמת בהצלחה! עכשיו אפשר להתחבר')
@@ -95,28 +98,23 @@ export function Register() {
 
   return (
     <div className="auth-page">
-      <form className="auth-card" onSubmit={submit}>
+      <form className="auth-card" onSubmit={submit} autoComplete="off">
         <div className="auth-logo">
           <Logo size={64} />
         </div>
         <h1>רישום רכזת</h1>
         <p className="muted">במערכת יש רכזת אחת. אחרי הרישום תוכלי להוסיף את המדריכות.</p>
         <Field label="שם מלא">
-          <input value={form.fullName} onChange={set('fullName')} required minLength={2} autoFocus />
+          <input value={form.fullName} onChange={set('fullName')} required minLength={2} {...fresh} />
         </Field>
         <Field label="אימייל">
-          <input type="email" value={form.email} onChange={set('email')} required dir="ltr" />
+          <input type="email" value={form.email} onChange={set('email')} required dir="ltr" {...fresh} />
         </Field>
-        <div className="form-row">
-          <Field label="טלפון">
-            <input value={form.phone} onChange={set('phone')} required inputMode="tel" dir="ltr" />
-          </Field>
-          <Field label="תעודת זהות" hint="9 ספרות">
-            <input value={form.nationalId} onChange={set('nationalId')} required pattern="\d{9}" inputMode="numeric" dir="ltr" />
-          </Field>
-        </div>
+        <Field label="טלפון">
+          <input value={form.phone} onChange={set('phone')} required inputMode="tel" dir="ltr" {...fresh} />
+        </Field>
         <Field label="סיסמה" hint="לפחות 8 תווים">
-          <input type="password" value={form.password} onChange={set('password')} required minLength={8} dir="ltr" />
+          <input type="password" value={form.password} onChange={set('password')} required minLength={8} dir="ltr" {...fresh} autoComplete="new-password" />
         </Field>
         {error && <div className="form-error">{error}</div>}
         <button className="btn btn-primary btn-block" disabled={busy}>

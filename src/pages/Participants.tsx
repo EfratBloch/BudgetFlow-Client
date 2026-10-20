@@ -3,7 +3,7 @@ import { useState } from 'react'
 import * as endpoints from '../api/endpoints'
 import type { ParticipantDto } from '../api/types'
 import { useAuth } from '../auth/AuthContext'
-import { Group } from '../components/Art'
+import { ArtTile, Icon } from '../components/Art'
 import { ParticipantEditor } from '../components/Editors'
 import { ParticipantBubbles } from '../components/Showcase'
 import { EmptyState, ErrorBox, Loader, PageHeader } from '../components/ui'
@@ -24,17 +24,20 @@ export function ParticipantsSection({ guideId }: { guideId: number }) {
     <>
       <div className="toolbar">
         <button className="btn btn-primary" onClick={() => setEditing('new')}>
-          ＋ הוספת חניכה
+          <Icon name="plus" size={18} /> הוספת חניכה
         </button>
         {data.length > 0 && (
-          <input className="search" placeholder="🔍 חיפוש לפי שם או טלפון" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <span className="search">
+            <Icon name="search" size={17} />
+            <input placeholder="חיפוש לפי שם או טלפון" value={search} onChange={(e) => setSearch(e.target.value)} />
+          </span>
         )}
         <span className="muted">{data.length} חניכות בקבוצה</span>
       </div>
 
       {data.length === 0 ? (
         <EmptyState
-          art={<Group size={80} />}
+          art={<ArtTile icon="users" size={76} />}
           title="עוד אין חניכות בקבוצה"
           text="הוסיפי את החניכה הראשונה. אחר כך אפשר לסמן אותה בכל מפגש."
           action={
@@ -65,7 +68,7 @@ export function Participants() {
   const { session } = useAuth()
   return (
     <div className="page theme-participants">
-      <PageHeader theme="participants" title="החניכות שלי" subtitle="לחצי על חניכה כדי לערוך או למחוק אותה" art={<Group size={56} />} />
+      <PageHeader theme="participants" title="החניכות שלי" subtitle="לחצי על חניכה כדי לערוך או למחוק אותה" eyebrow="הקבוצה שלי" art={<ArtTile icon="users" size={72} />} />
       <ParticipantsSection guideId={session!.userId} />
     </div>
   )

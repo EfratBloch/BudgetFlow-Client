@@ -1,21 +1,21 @@
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
-import { Group, MeetingCircle, Projector, Wallet } from '../components/Art'
+import { ArtTile, FlowOrbit } from '../components/Art'
 import { Reveal } from '../components/ui'
 
 const features = [
   {
-    art: <Wallet size={64} />,
+    art: <ArtTile icon="wallet" size={60} />,
     title: 'תקציב שמתעדכן לבד',
     text: 'כל קופה מחושבת מהתעריפים ומההוצאות. רואים מיד כמה נשאר, ואף פגישה לא חורגת בלי אישור.',
   },
   {
-    art: <Group size={64} />,
+    art: <ArtTile icon="calendar" size={60} />,
     title: 'מפגשים וחניכות',
     text: 'מדווחים מפגש בכמה לחיצות: מי הגיעה, מה עשינו וכמה הוצאנו. הכול נשמר ומסודר לפי תאריך.',
   },
   {
-    art: <Projector size={64} />,
+    art: <ArtTile icon="box" size={60} />,
     title: 'מחסן ציוד משותף',
     text: 'רואים מה פנוי ולוקחים בלחיצה. גם אם שתי מדריכות לוחצות באותו רגע, רק אחת מקבלת את המקרן.',
   },
@@ -49,7 +49,7 @@ export function Home() {
           </div>
         </div>
         <div className="hero-art">
-          <MeetingCircle />
+          <FlowOrbit />
         </div>
       </section>
 

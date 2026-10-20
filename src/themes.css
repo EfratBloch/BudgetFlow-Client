@@ -1,396 +1,734 @@
-/* Page themes: every page shares the same shapes and fonts, but has its own
-   colour, banner pattern and floating shapes, so pages resemble each other
-   without being identical. */
+/* Page themes: every page shares the same glass panels, type and motion, but has its own
+   accent colour and line pattern, so pages clearly belong together without being identical. */
 
 .page {
-  --accent: var(--teal-600);
-  --accent-2: var(--teal-400);
-  --accent-dark: var(--teal-900);
-  --accent-soft: var(--teal-50);
+  --accent: #db2777;
+  --accent-2: #f472b6;
+  --accent-dark: #9d174d;
+  --accent-soft: #fdf2f8;
+  --accent-warm: #38bdf8;
 }
 
 .theme-participants {
-  --accent: #2ba88a;
-  --accent-2: #6fd3a8;
-  --accent-dark: #145c4c;
-  --accent-soft: #e6f6ef;
+  --accent: #0284c7;
+  --accent-2: #38bdf8;
+  --accent-dark: #075985;
+  --accent-soft: #f0f9ff;
+  --accent-warm: #f472b6;
 }
 
 .theme-meetings {
-  --accent: #3a86c8;
-  --accent-2: #2cc9c1;
-  --accent-dark: #1d4f7a;
-  --accent-soft: #e8f2fb;
+  --accent: #e11d48;
+  --accent-2: #fb7185;
+  --accent-dark: #9f1239;
+  --accent-soft: #fff1f2;
 }
 
 .theme-equipment {
-  --accent: #d99a1e;
-  --accent-2: #f6c445;
-  --accent-dark: #6f4a00;
-  --accent-soft: #fdf3dc;
+  --accent: #0ea5e9;
+  --accent-2: #7dd3fc;
+  --accent-dark: #0c4a6e;
+  --accent-soft: #f0f9ff;
+  --accent-warm: #ef4444;
 }
 
 .theme-guides {
-  --accent: #7c6cd6;
-  --accent-2: #a99cf0;
-  --accent-dark: #3f348f;
-  --accent-soft: #f0eefc;
+  --accent: #c026d3;
+  --accent-2: #f0abfc;
+  --accent-dark: #86198f;
+  --accent-soft: #fdf4ff;
 }
 
 .theme-additions {
-  --accent: #0e9f9a;
-  --accent-2: #f6c445;
-  --accent-dark: #0b4f5c;
-  --accent-soft: #fdf6e1;
+  --accent: #dc2626;
+  --accent-2: #f87171;
+  --accent-dark: #991b1b;
+  --accent-soft: #fef2f2;
 }
 
 .theme-branch {
-  --accent: #14b8c4;
-  --accent-2: #6fd3a8;
-  --accent-dark: #0b5f68;
-  --accent-soft: #e4f7f8;
+  --accent: #0284c7;
+  --accent-2: #f472b6;
+  --accent-dark: #0c4a6e;
+  --accent-soft: #f0f9ff;
 }
 
-/* Inside a themed page the main buttons, titles and cards take the page colour */
+/* Inside a themed page the main buttons and links take the page colour */
 .page .btn-primary {
   background: linear-gradient(135deg, var(--accent-2), var(--accent));
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0 10px 22px -10px color-mix(in srgb, var(--accent) 85%, transparent);
 }
 
-.page .section-title {
-  color: var(--accent-dark);
-}
-
-.page .card {
-  border-top: 4px solid var(--accent);
-}
-
-.page .segmented button.active,
-.page .attend-chip.on {
-  background: var(--accent);
-  border-color: var(--accent);
+.page .btn-primary:hover:not(:disabled) {
+  box-shadow: 0 16px 30px -12px color-mix(in srgb, var(--accent) 90%, transparent);
 }
 
 .page .back-link {
   color: var(--accent-dark);
 }
 
-.page input:focus,
-.page select:focus,
-.page textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent);
-}
-
-/* ---------- The banner ---------- */
+/* ---------- The title panel ---------- */
 
 .page-hero {
   position: relative;
   overflow: hidden;
+  isolation: isolate;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 18px;
   flex-wrap: wrap;
-  padding: 26px 28px;
-  margin-bottom: 24px;
-  border-radius: 26px;
-  color: #fff;
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  box-shadow: 0 14px 34px color-mix(in srgb, var(--accent) 30%, transparent);
-  animation: page-in 0.5s ease both;
+  padding: 28px 30px;
+  margin-bottom: 22px;
+  border-radius: 28px;
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  animation: page-in 0.6s var(--ease) both;
 }
 
-.page-hero h1 {
-  color: #fff;
-  margin-bottom: 4px;
+/* A soft orb of the page colour in the corner, breathing slowly */
+.hero-glow {
+  position: absolute;
+  z-index: -1;
+  width: 340px;
+  height: 340px;
+  inset-inline-end: -110px;
+  top: -170px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent-2) 55%, transparent), transparent 68%);
+  animation: glow-breathe 9s ease-in-out infinite;
 }
 
-.page-hero p {
-  margin: 0;
-  opacity: 0.92;
+.hero-glow::after {
+  content: '';
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  left: -60%;
+  top: 110%;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent-warm) 45%, transparent), transparent 70%);
+}
+
+@keyframes glow-breathe {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-30px, 20px) scale(1.15);
+  }
+}
+
+.hero-pattern {
+  position: absolute;
+  z-index: -1;
+  inset-inline-end: 0;
+  top: 0;
+  width: 46%;
+  height: 100%;
+  color: var(--accent);
+  opacity: 0.16;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  -webkit-mask-image: linear-gradient(to left, transparent, #000 40%);
+  mask-image: linear-gradient(to left, transparent, #000 40%);
+  animation: pattern-drift 18s ease-in-out infinite alternate;
+}
+
+.hero-pattern .node {
+  fill: currentColor;
+}
+
+@keyframes pattern-drift {
+  to {
+    transform: translateX(-24px);
+  }
 }
 
 .page-hero-main {
-  position: relative;
-  z-index: 1;
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 20px;
+  min-width: 0;
 }
 
 .page-hero-art {
-  display: grid;
-  place-items: center;
-  width: 86px;
-  height: 86px;
-  border-radius: 26px;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
   flex-shrink: 0;
-  animation: bob 4s ease-in-out infinite;
+  animation: float 7s ease-in-out infinite;
+}
+
+.page-hero-text h1 {
+  margin: 0 0 4px;
+  background: linear-gradient(120deg, var(--ink) 30%, var(--accent-dark));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.page-hero-text p {
+  margin: 0;
+  color: var(--ink-2);
+  max-width: 560px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.eyebrow::before {
+  content: '';
+  width: 18px;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent-warm), var(--accent));
 }
 
 .page-hero-actions {
-  position: relative;
-  z-index: 1;
   display: flex;
   gap: 10px;
-}
-
-.page .page-hero-actions .btn-primary {
-  background: #fff;
-  color: var(--accent-dark);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  flex-wrap: wrap;
 }
 
 .hero-stats {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .hero-stat {
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.2);
+  padding: 5px 13px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--line);
   font-size: 0.9rem;
 }
 
 .hero-stat strong {
   font-size: 1.05rem;
+  color: var(--accent-dark);
 }
 
-/* Floating shapes - their form changes from page to page */
-.hero-shape {
-  position: absolute;
-  z-index: 0;
-  pointer-events: none;
-  background: rgba(255, 255, 255, 0.13);
+/* ---------- Budget pots ---------- */
+
+.pots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
 }
 
-.hero-shape.s1 {
-  width: 180px;
-  height: 180px;
-  inset-inline-end: -40px;
-  top: -70px;
-  border-radius: 50%;
-  animation: float 7s ease-in-out infinite;
+.pots-compact {
+  margin-bottom: 20px;
 }
 
-.hero-shape.s2 {
-  width: 90px;
-  height: 90px;
-  inset-inline-end: 22%;
-  bottom: -40px;
-  border-radius: 50%;
-  animation: float 9s ease-in-out infinite reverse;
-}
-
-.hero-shape.s3 {
-  width: 46px;
-  height: 46px;
-  inset-inline-start: 40%;
-  top: 14px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  animation: float 5s ease-in-out infinite;
-}
-
-/* home: a soft wave at the bottom */
-.hero-home {
-  background:
-    radial-gradient(120% 60% at 50% 130%, rgba(255, 255, 255, 0.16) 40%, transparent 41%),
-    linear-gradient(135deg, var(--accent-2), var(--accent-dark));
-}
-
-/* participants: a field of dots and blob-shaped "heads" */
-.hero-participants {
-  background:
-    radial-gradient(rgba(255, 255, 255, 0.18) 2px, transparent 2.5px) 0 0 / 22px 22px,
-    linear-gradient(135deg, var(--accent-2), var(--accent-dark));
-}
-
-.hero-participants .hero-shape {
-  border-radius: 42% 58% 55% 45% / 48% 42% 58% 52%;
-  animation:
-    blob 8s ease-in-out infinite,
-    float 7s ease-in-out infinite;
-}
-
-/* meetings: a calendar grid */
-.hero-meetings {
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px) 0 0 / 34px 34px,
-    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px) 0 0 / 34px 34px,
-    linear-gradient(135deg, var(--accent), var(--accent-dark));
-}
-
-.hero-meetings .hero-shape {
-  border-radius: 14px;
-}
-
-/* equipment: warehouse stripes */
-.hero-equipment {
-  background:
-    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.09) 0 14px, transparent 14px 28px),
-    linear-gradient(135deg, var(--accent-2), #b9770e);
-}
-
-.hero-equipment h1 {
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-.hero-equipment .hero-shape {
-  border-radius: 8px;
-}
-
-/* guides: rings */
-.hero-guides {
-  background:
-    repeating-radial-gradient(circle at 10% 120%, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 30px),
-    linear-gradient(135deg, var(--accent-2), var(--accent-dark));
-}
-
-.hero-guides .hero-shape {
-  background: transparent;
-  border: 6px solid rgba(255, 255, 255, 0.2);
-}
-
-/* additions: gold coins */
-.hero-additions {
-  background:
-    radial-gradient(circle at 85% 30%, rgba(246, 196, 69, 0.55) 0 26px, transparent 27px),
-    radial-gradient(circle at 75% 75%, rgba(246, 196, 69, 0.4) 0 16px, transparent 17px),
-    linear-gradient(135deg, var(--accent), var(--accent-dark));
-}
-
-.hero-additions .hero-shape {
-  background: rgba(246, 196, 69, 0.35);
-  box-shadow: inset 0 -5px 0 rgba(0, 0, 0, 0.08);
-}
-
-/* branch: confetti */
-.hero-branch {
-  background:
-    radial-gradient(circle at 20% 30%, rgba(246, 196, 69, 0.6) 0 4px, transparent 5px),
-    radial-gradient(circle at 70% 20%, rgba(255, 255, 255, 0.5) 0 3px, transparent 4px),
-    radial-gradient(circle at 55% 80%, rgba(246, 196, 69, 0.5) 0 5px, transparent 6px),
-    radial-gradient(circle at 88% 65%, rgba(255, 255, 255, 0.45) 0 4px, transparent 5px),
-    radial-gradient(circle at 35% 70%, rgba(255, 255, 255, 0.35) 0 3px, transparent 4px),
-    linear-gradient(135deg, var(--accent), var(--accent-dark));
-}
-
-.hero-branch .hero-shape {
-  border-radius: 42% 58% 55% 45% / 48% 42% 58% 52%;
-  animation:
-    blob 9s ease-in-out infinite,
-    float 6s ease-in-out infinite;
-}
-
-/* ---------- Page-specific touches ---------- */
-
-/* Equipment cards stand on a "shelf" */
-.theme-equipment .equipment-card {
-  border-bottom: 7px solid #e7b955;
-}
-
-/* Guides: violet avatars and a coloured edge on each card */
-.theme-guides .avatar-large,
-.theme-guides .avatar-xl {
-  background: linear-gradient(135deg, var(--accent-2), var(--accent-dark));
-}
-
-.theme-guides .person-card {
-  border-inline-start: 5px solid var(--accent);
-}
-
-/* Participants: the bubbles sit on a dotted board */
-.theme-participants .bubbles,
-.theme-branch .bubbles {
-  padding: 18px;
-  border-radius: 24px;
-  background:
-    radial-gradient(color-mix(in srgb, var(--accent) 18%, transparent) 1.5px, transparent 2px) 0 0 / 20px 20px,
-    var(--accent-soft);
-}
-
-/* ---------- Meetings timeline ---------- */
-
-.timeline {
+.pot-card {
+  --pot: var(--accent);
   position: relative;
-  padding-inline-start: 28px;
+  overflow: hidden;
+  padding: 20px;
+  border-radius: var(--radius);
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  transition:
+    transform 0.4s var(--ease),
+    box-shadow 0.4s var(--ease);
 }
 
-.timeline::before {
-  content: '';
-  position: absolute;
-  inset-inline-start: 8px;
-  top: 6px;
-  bottom: 6px;
-  width: 4px;
-  border-radius: 4px;
-  background: linear-gradient(var(--accent-2), var(--accent));
-  opacity: 0.5;
+.pot-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
 
-.timeline-month {
-  margin-bottom: 26px;
+.pot-Activity {
+  --pot: #db2777;
+  --pot-2: #f472b6;
 }
 
-.timeline-title {
-  position: relative;
+.pot-Birthday {
+  --pot: #dc2626;
+  --pot-2: #f87171;
+}
+
+.pot-GuideMeetings {
+  --pot: #0284c7;
+  --pot-2: #7dd3fc;
+}
+
+.pot-Annual {
+  --pot: #e11d48;
+  --pot-2: #fda4af;
+}
+
+.pot-title {
   display: flex;
   align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.pot-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 11px;
+  color: #fff;
+  background: linear-gradient(140deg, var(--pot-2), var(--pot));
+  flex-shrink: 0;
+}
+
+.pot-remaining {
+  margin-top: 10px;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.pot-sub,
+.pot-foot,
+.pot-formula {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.pot-bar {
+  height: 10px;
+  margin: 12px 0 6px;
+  border-radius: 999px;
+  background: rgba(15, 60, 70, 0.08);
+  overflow: hidden;
+}
+
+.pot-bar-thin {
+  height: 6px;
+  margin: 0;
+}
+
+.pot-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--pot-2, var(--accent-2)), var(--pot, var(--accent)));
+  transition: width 1.2s var(--ease);
+}
+
+.pot-mid .pot-bar-fill {
+  background: linear-gradient(90deg, #7dd3fc, #0ea5e9);
+}
+
+.pot-low .pot-bar-fill {
+  background: linear-gradient(90deg, #fca5a5, #dc4b4b);
+}
+
+.pot-foot {
+  display: flex;
+  justify-content: space-between;
+}
+
+.pot-formula {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+}
+
+/* The home page strip: small chips with a ring */
+.pot-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 10px;
-  color: var(--accent-dark);
   margin-bottom: 12px;
 }
 
-.timeline-dot {
-  position: absolute;
-  inset-inline-start: -28px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #fff;
-  border: 5px solid var(--accent);
-  animation: pulse 2.4s ease-in-out infinite;
+.pot-chip-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
+  animation: page-in 0.5s var(--ease) both;
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
 }
 
-.timeline-count {
-  font-size: 0.8rem;
-  font-weight: 700;
-  padding: 2px 10px;
-  border-radius: 999px;
-  background: var(--accent-soft);
+.pot-chip-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+
+.pot-chip-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pot-chip-percent {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--pot);
+}
+
+.pot-mid .pot-chip-percent {
+  color: #0284c7;
+}
+
+.pot-low .pot-chip-percent {
+  color: #dc4b4b;
+}
+
+.pot-bar-strip {
+  height: 8px;
+  margin: 2px 0 0;
+}
+
+.pot-chip-foot {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.pot-chip-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.pot-chip-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.pot-chip-text strong {
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.pot-chip-of {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.pot-ring {
+  --c: var(--pot);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background:
+    radial-gradient(closest-side, rgba(255, 255, 255, 0.95) 76%, transparent 78%),
+    conic-gradient(var(--c) calc(var(--p) * 1%), rgba(15, 60, 70, 0.1) 0);
+}
+
+.pot-mid .pot-ring {
+  --c: #f59e0b;
+}
+
+.pot-low .pot-ring {
+  --c: #dc4b4b;
+}
+
+.pot-ring span {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--ink-2);
+}
+
+/* ---------- Meetings: an even grid of cards, grouped by month ---------- */
+
+.meeting-months {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.month-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  font-size: 1.1rem;
   color: var(--accent-dark);
 }
 
-@keyframes pulse {
+.month-title::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(to left, transparent, color-mix(in srgb, var(--accent) 35%, transparent));
+}
+
+.flow-count {
+  padding: 1px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  background: var(--accent-soft);
+}
+
+.meeting-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.meeting-grid-item {
+  display: flex;
+  animation: page-in 0.55s var(--ease) both;
+}
+
+.meeting-card.type-Activity {
+  --node: #db2777;
+}
+
+.meeting-card.type-Birthday {
+  --node: #dc2626;
+}
+
+.meeting-card.type-GuidesMeeting {
+  --node: #0284c7;
+}
+
+.meeting-card.type-SpecialEvent {
+  --node: #e11d48;
+}
+
+.meeting-card {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px 16px;
+  border-radius: 22px;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--node) 10%, transparent), transparent 60%),
+    var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-border);
+  border-top: 4px solid var(--node);
+  box-shadow: var(--shadow);
+  transition:
+    transform 0.45s var(--ease),
+    box-shadow 0.45s var(--ease);
+}
+
+.meeting-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.meeting-card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.meeting-card-icon {
+  flex-shrink: 0;
+  filter: drop-shadow(0 10px 14px color-mix(in srgb, var(--node) 40%, transparent));
+  transition: transform 0.5s var(--ease);
+}
+
+.meeting-card:hover .meeting-card-icon {
+  transform: rotate(-7deg) scale(1.07);
+}
+
+.meeting-card-top {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.meeting-card-chairs {
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+
+.meeting-date {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.meeting-title {
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.meeting-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+  font-size: 0.85rem;
+  color: var(--ink-2);
+}
+
+.meeting-meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.meeting-meta .icon {
+  color: var(--node);
+}
+
+/* The chairs rock gently, each a little after the one before; faster when the card is hovered */
+.chairs {
+  overflow: visible;
+}
+
+.chair-body {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: chair-rock 3.2s ease-in-out infinite;
+}
+
+.meeting-card:hover .chair-body {
+  animation: chair-hop 0.8s ease-in-out infinite;
+}
+
+@keyframes chair-rock {
   0%,
   100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 40%, transparent);
+    transform: rotate(-5deg);
   }
   50% {
-    box-shadow: 0 0 0 8px transparent;
+    transform: rotate(5deg);
   }
+}
+
+@keyframes chair-hop {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  30% {
+    transform: translateY(-5px) rotate(-6deg);
+  }
+  60% {
+    transform: translateY(0) rotate(4deg);
+  }
+}
+
+/* One meeting's page */
+.meeting-hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+  padding: 26px;
+  margin-bottom: 20px;
+  border-radius: 28px;
+  background:
+    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--node) 16%, transparent), transparent 55%),
+    var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  animation: page-in 0.6s var(--ease) both;
+}
+
+.meeting-hero.type-Activity {
+  --node: #db2777;
+}
+
+.meeting-hero.type-Birthday {
+  --node: #dc2626;
+}
+
+.meeting-hero.type-GuidesMeeting {
+  --node: #0284c7;
+}
+
+.meeting-hero.type-SpecialEvent {
+  --node: #e11d48;
+}
+
+.meeting-hero-art {
+  filter: drop-shadow(0 18px 24px color-mix(in srgb, var(--node) 40%, transparent));
+  animation: float 7s ease-in-out infinite;
+}
+
+.meeting-hero-text {
+  flex: 1;
+  min-width: 220px;
+}
+
+.meeting-hero h1 {
+  margin: 8px 0 6px;
+}
+
+.meeting-hero-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.meeting-hero-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 /* ---------- Branch participants ---------- */
 
-.toolbar-select {
-  width: auto;
-  min-width: 200px;
+.guide-group {
+  padding: 20px;
+  margin-bottom: 18px;
+  border-radius: var(--radius);
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
 }
 
-.guide-group {
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 20px;
+.guide-group .bubble {
+  background: rgba(255, 255, 255, 0.7);
 }
 
 .guide-group-head {
@@ -413,21 +751,24 @@
   flex-wrap: wrap;
 }
 
-@media (max-width: 600px) {
+/* ---------- Phones ---------- */
+
+@media (max-width: 760px) {
+  .meeting-grid {
+    grid-template-columns: 1fr;
+  }
+
   .page-hero {
     padding: 20px;
   }
 
-  .page-hero-art {
-    width: 64px;
-    height: 64px;
+  .page-hero-art .art-tile,
+  .page-hero-art .type-icon {
+    width: 56px !important;
+    height: 56px !important;
   }
 
-  .timeline {
-    padding-inline-start: 22px;
-  }
-
-  .timeline-dot {
-    inset-inline-start: -22px;
+  .hero-pattern {
+    width: 70%;
   }
 }

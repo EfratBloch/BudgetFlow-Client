@@ -1,5 +1,6 @@
 // Hebrew labels and number / date formatting, in one place.
 import type { BudgetSource, EquipmentStatus, MeetingType, UserRole } from '../api/types'
+import type { IconName } from '../components/Art'
 
 export const meetingTypeLabel: Record<MeetingType, string> = {
   Activity: 'פעילות',
@@ -8,18 +9,19 @@ export const meetingTypeLabel: Record<MeetingType, string> = {
   SpecialEvent: 'אירוע מיוחד',
 }
 
-export const meetingTypeEmoji: Record<MeetingType, string> = {
-  Activity: '🎯',
-  Birthday: '🎂',
-  GuidesMeeting: '🤝',
-  SpecialEvent: '✨',
-}
-
 export const potLabel: Record<BudgetSource, string> = {
   Activity: 'קופת פעילות',
   Birthday: 'קופת ימי הולדת',
   GuideMeetings: 'קופת מפגשי מדריכות',
   Annual: 'קופה שנתית',
+}
+
+// The line icon that stands for each pot
+export const potIcon: Record<BudgetSource, IconName> = {
+  Activity: 'megaphone',
+  Birthday: 'cake',
+  GuideMeetings: 'talk',
+  Annual: 'star',
 }
 
 export const roleLabel: Record<UserRole, string> = {
@@ -77,7 +79,7 @@ export const formulaInHebrew = (formula: string) =>
   formulaWords.reduce((text, [pattern, word]) => text.replace(pattern, word), formula)
 
 // A stable colour per name, so the same participant always gets the same bubble colour
-const palette = ['#0E9F9A', '#14B8C4', '#2BA88A', '#3A86C8', '#7C6CD6', '#E0A526', '#E77E6B', '#4FB3A9']
+const palette = ['#EC4899', '#38BDF8', '#EF4444', '#0284C7', '#F472B6', '#E11D48', '#7DD3FC', '#DB2777']
 export function colorFor(name: string): string {
   let hash = 0
   for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) >>> 0

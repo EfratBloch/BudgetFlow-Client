@@ -1,8 +1,9 @@
-// The "interesting" views: participants as colourful bubbles and meetings as calendar cards.
+// The "interesting" views: participants as colourful tiles and meetings as cards
+// in an even grid, grouped by month.
 import { Link } from 'react-router-dom'
 import type { MeetingListItemDto, ParticipantDto } from '../api/types'
-import { colorFor, dayOfMonth, formatMoney, initials, meetingTypeEmoji, meetingTypeLabel, monthShort, weekday } from '../utils/format'
-import { Chair } from './Art'
+import { colorFor, formatDate, formatMoney, initials, meetingTypeLabel, weekday } from '../utils/format'
+import { Chairs, Icon, TypeIcon } from './Art'
 
 export function ParticipantBubbles({
   participants,
@@ -17,26 +18,22 @@ export function ParticipantBubbles({
         const color = colorFor(p.fullName)
         const content = (
           <>
-            <span className="bubble-shape" style={{ background: color }}>
-              {initials(p.fullName)}
+            <span className="bubble-shape">{initials(p.fullName)}</span>
+            <span className="bubble-text">
+              <span className="bubble-name">{p.fullName}</span>
+              <span className="bubble-phone" dir="ltr">
+                {p.phone}
+              </span>
             </span>
-            <span className="bubble-name">{p.fullName}</span>
-            <span className="bubble-phone">{p.phone}</span>
           </>
         )
+        const style = { animationDelay: `${Math.min(i, 20) * 40}ms`, ['--bubble' as string]: color }
         return onSelect ? (
-          <button
-            key={p.id}
-            type="button"
-            className="bubble"
-            style={{ animationDelay: `${i * 60}ms`, ['--bubble' as string]: color }}
-            onClick={() => onSelect(p)}
-            title="לחצי לעריכה"
-          >
+          <button key={p.id} type="button" className="bubble" style={style} onClick={() => onSelect(p)} title="לחצי לעריכה">
             {content}
           </button>
         ) : (
-          <div key={p.id} className="bubble" style={{ animationDelay: `${i * 60}ms`, ['--bubble' as string]: color }}>
+          <div key={p.id} className="bubble" style={style}>
             {content}
           </div>
         )
@@ -45,15 +42,53 @@ export function ParticipantBubbles({
   )
 }
 
-const chairColor: Record<string, string> = {
-  Activity: '#0E9F9A',
-  Birthday: '#E0A526',
-  GuidesMeeting: '#3A86C8',
-  SpecialEvent: '#7C6CD6',
+const typeColor: Record<string, string> = {
+  Activity: '#EC4899',
+  Birthday: '#EF4444',
+  GuidesMeeting: '#0EA5E9',
+  SpecialEvent: '#E11D48',
 }
 
-// The meetings page: the same cards, hung on a timeline and grouped by month
-export function MeetingTimeline({ meetings, showReporter = false }: { meetings: MeetingListItemDto[]; showReporter?: boolean }) {
+export function MeetingCard({ meeting: m, showReporter }: { meeting: MeetingListItemDto; showReporter: boolean }) {
+  return (
+    <Link to={`/meetings/${m.id}`} className={`meeting-card type-${m.type}`}>
+      <span className="meeting-card-head">
+        <span className="meeting-card-icon">
+          <TypeIcon type={m.type} size={54} />
+        </span>
+        <span className="meeting-card-top">
+          <span className={`type-chip type-chip-${m.type}`}>{meetingTypeLabel[m.type]}</span>
+          <span className="meeting-date">
+            {weekday(m.date)}, {formatDate(m.date)}
+          </span>
+        </span>
+        <span className="meeting-card-chairs">
+          <Chairs color={typeColor[m.type]} size={66} />
+        </span>
+      </span>
+      <span className="meeting-title">{m.program}</span>
+      {showReporter && <span className="muted small">דיווחה: {m.reporterName}</span>}
+      <span className="meeting-meta">
+        {m.type !== 'Birthday' && (
+          <span>
+            <Icon name="users" size={15} /> {m.participantCount} משתתפות
+          </span>
+        )}
+        <span>
+          <Icon name="coins" size={15} /> {formatMoney(m.totalExpenses)}
+        </span>
+        {m.equipmentName && (
+          <span>
+            <Icon name="box" size={15} /> {m.equipmentName}
+          </span>
+        )}
+      </span>
+    </Link>
+  )
+}
+
+// Meetings grouped by month, as an even grid of cards
+export function MeetingFlow({ meetings, showReporter = false }: { meetings: MeetingListItemDto[]; showReporter?: boolean }) {
   const groups: { key: string; title: string; items: MeetingListItemDto[] }[] = []
   for (const m of meetings) {
     const d = new Date(m.date)
@@ -67,51 +102,22 @@ export function MeetingTimeline({ meetings, showReporter = false }: { meetings: 
   }
 
   return (
-    <div className="timeline">
+    <div className="meeting-months">
       {groups.map((g) => (
-        <section key={g.key} className="timeline-month">
-          <h3 className="timeline-title">
-            <span className="timeline-dot" />
+        <section key={g.key} className="meeting-month">
+          <h3 className="month-title">
+            <Icon name="calendar" size={17} />
             {g.title}
-            <span className="timeline-count">{g.items.length} מפגשים</span>
+            <span className="flow-count">{g.items.length} מפגשים</span>
           </h3>
-          <MeetingCards meetings={g.items} showReporter={showReporter} />
+          <div className="meeting-grid">
+            {g.items.map((m, i) => (
+              <div key={m.id} className="meeting-grid-item" style={{ animationDelay: `${Math.min(i, 12) * 50}ms` }}>
+                <MeetingCard meeting={m} showReporter={showReporter} />
+              </div>
+            ))}
+          </div>
         </section>
-      ))}
-    </div>
-  )
-}
-
-export function MeetingCards({ meetings, showReporter = false }: { meetings: MeetingListItemDto[]; showReporter?: boolean }) {
-  return (
-    <div className="meeting-cards">
-      {meetings.map((m, i) => (
-        <Link
-          key={m.id}
-          to={`/meetings/${m.id}`}
-          className={`meeting-card type-${m.type}`}
-          style={{ animationDelay: `${i * 70}ms` }}
-        >
-          <div className="calendar-leaf">
-            <span className="leaf-month">{monthShort(m.date)}</span>
-            <span className="leaf-day">{dayOfMonth(m.date)}</span>
-            <span className="leaf-weekday">{weekday(m.date)}</span>
-          </div>
-          <div className="meeting-card-body">
-            <span className="type-chip">
-              {meetingTypeEmoji[m.type]} {meetingTypeLabel[m.type]}
-            </span>
-            <h4>{m.program}</h4>
-            {showReporter && <div className="muted small">דיווחה: {m.reporterName}</div>}
-            <div className="meeting-meta">
-              <span>👥 {m.participantCount} משתתפות</span>
-              <span>💰 {formatMoney(m.totalExpenses)}</span>
-            </div>
-          </div>
-          <div className="meeting-card-art">
-            <Chair size={54} color={chairColor[m.type]} />
-          </div>
-        </Link>
       ))}
     </div>
   )

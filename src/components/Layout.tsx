@@ -1,24 +1,26 @@
-// The frame of every page: the header with logo, role-based menu and user box, plus the footer.
+// The frame of every page: the drifting background, the header with logo, role-based menu
+// and user box, plus the footer.
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { roleLabel } from '../utils/format'
-import { Logo } from './Art'
+import { Aurora, Icon, Logo, type IconName } from './Art'
 
-const guideMenu = [
-  { to: '/dashboard', label: 'הלוח שלי' },
-  { to: '/participants', label: 'החניכות שלי' },
-  { to: '/meetings', label: 'המפגשים שלי' },
-  { to: '/equipment', label: 'מחסן ציוד' },
+const guideMenu: { to: string; label: string; icon: IconName }[] = [
+  { to: '/dashboard', label: 'דף הבית', icon: 'home' },
+  { to: '/participants', label: 'החניכות שלי', icon: 'users' },
+  { to: '/meetings', label: 'המפגשים שלי', icon: 'calendar' },
+  { to: '/equipment', label: 'מחסן ציוד', icon: 'box' },
 ]
 
-const coordinatorMenu = [
-  { to: '/dashboard', label: 'לוח בקרה' },
-  { to: '/guides', label: 'מדריכות' },
-  { to: '/branch-participants', label: 'כל החניכות' },
-  { to: '/meetings', label: 'מפגשים' },
-  { to: '/additions', label: 'תוספות תקציב' },
-  { to: '/equipment', label: 'מחסן ציוד' },
+const coordinatorMenu: { to: string; label: string; icon: IconName }[] = [
+  { to: '/dashboard', label: 'דף הבית', icon: 'home' },
+  { to: '/guides', label: 'מדריכות', icon: 'user' },
+  { to: '/branch-participants', label: 'כל החניכות', icon: 'users' },
+  { to: '/meetings', label: 'המפגשים שלי', icon: 'calendar' },
+  { to: '/guide-meetings', label: 'מפגשי המדריכות', icon: 'list' },
+  { to: '/additions', label: 'תוספות תקציב', icon: 'coins' },
+  { to: '/equipment', label: 'מחסן ציוד', icon: 'box' },
 ]
 
 export function Layout() {
@@ -30,7 +32,7 @@ export function Layout() {
   const setOpen = (toggle: (wasOpen: boolean) => boolean) => setOpenOn(toggle(open) ? location.pathname : null)
   const [scrolled, setScrolled] = useState(false)
 
-  // The header gets a shadow once the page is scrolled
+  // The header gets more glass once the page is scrolled
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -41,17 +43,19 @@ export function Layout() {
 
   return (
     <div className="app">
+      <Aurora />
+
       <header className={`header ${scrolled ? 'header-scrolled' : ''}`}>
         <div className="header-inner">
           <Link to={session ? '/dashboard' : '/'} className="brand">
-            <Logo size={40} />
+            <Logo size={38} />
             <span className="brand-name">
               Budget<span>Flow</span>
             </span>
           </Link>
 
           {session && (
-            <button className="menu-toggle" onClick={() => setOpen((v) => !v)} aria-label="תפריט" aria-expanded={open}>
+            <button className={`menu-toggle ${open ? 'is-open' : ''}`} onClick={() => setOpen((v) => !v)} aria-label="תפריט" aria-expanded={open}>
               <span />
               <span />
               <span />
@@ -61,13 +65,14 @@ export function Layout() {
           <nav className={`nav ${open ? 'nav-open' : ''}`}>
             {menu.map((item) => (
               <NavLink key={item.to} to={item.to} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <Icon name={item.icon} size={17} />
                 {item.label}
               </NavLink>
             ))}
             {session && (
               <div className="user-box user-box-mobile">
                 <button className="btn btn-ghost btn-small" onClick={logout}>
-                  יציאה
+                  <Icon name="logout" size={16} /> יציאה
                 </button>
               </div>
             )}
@@ -81,7 +86,7 @@ export function Layout() {
                 <span className={`role-badge role-${session.role}`}>{roleLabel[session.role]}</span>
               </span>
               <button className="btn btn-ghost btn-small" onClick={logout}>
-                יציאה
+                <Icon name="logout" size={16} /> יציאה
               </button>
             </div>
           ) : (
@@ -99,7 +104,7 @@ export function Layout() {
       </main>
 
       <footer className="footer">
-        <Logo size={22} /> BudgetFlow · ניהול תקציב, מפגשים וציוד לסניף
+        <Logo size={20} /> BudgetFlow · ניהול תקציב, מפגשים וציוד לסניף
       </footer>
     </div>
   )

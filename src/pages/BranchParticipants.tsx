@@ -3,7 +3,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import * as endpoints from '../api/endpoints'
 import type { ParticipantDto, UserDto } from '../api/types'
-import { Group } from '../components/Art'
+import { ArtTile, Icon } from '../components/Art'
+import { Select } from '../components/Controls'
 import { ParticipantEditor } from '../components/Editors'
 import { ParticipantBubbles } from '../components/Showcase'
 import { EmptyState, ErrorBox, Loader, PageHeader, Reveal } from '../components/ui'
@@ -44,7 +45,8 @@ export function BranchParticipants() {
         theme="branch"
         title="כל החניכות בסניף"
         subtitle="כל החניכות של כל המדריכות, במקום אחד. לחצי על חניכה כדי לערוך אותה."
-        art={<Group size={56} />}
+        eyebrow="סניף"
+        art={<ArtTile icon="users" size={72} />}
         stats={[
           { label: 'חניכות', value: total },
           { label: 'מדריכות', value: data.length },
@@ -53,7 +55,7 @@ export function BranchParticipants() {
 
       {data.length === 0 ? (
         <EmptyState
-          art={<Group size={80} />}
+          art={<ArtTile icon="users" size={76} />}
           title="עוד אין מדריכות בסניף"
           text="קודם מוסיפים מדריכות, ואז הן (או את) מוסיפות להן חניכות."
           action={
@@ -65,20 +67,21 @@ export function BranchParticipants() {
       ) : (
         <>
           <div className="toolbar">
-            <input className="search" placeholder="🔍 חיפוש חניכה לפי שם או טלפון" value={search} onChange={(e) => setSearch(e.target.value)} />
-            <select
-              className="toolbar-select"
-              value={guideFilter}
-              onChange={(e) => setGuideFilter(e.target.value ? Number(e.target.value) : '')}
-              aria-label="סינון לפי מדריכה"
-            >
-              <option value="">כל המדריכות</option>
-              {data.map((g) => (
-                <option key={g.guide.id} value={g.guide.id}>
-                  {g.guide.fullName} ({g.participants.length})
-                </option>
-              ))}
-            </select>
+            <span className="search">
+              <Icon name="search" size={17} />
+              <input placeholder="חיפוש חניכה לפי שם או טלפון" value={search} onChange={(e) => setSearch(e.target.value)} />
+            </span>
+            <Select<number>
+              ariaLabel="סינון לפי מדריכה"
+              className="select-inline"
+              value={guideFilter === '' ? 0 : guideFilter}
+              onChange={(v) => setGuideFilter(v || '')}
+              icon={<Icon name="user" size={16} />}
+              options={[
+                { value: 0, label: 'כל המדריכות' },
+                ...data.map((g) => ({ value: g.guide.id, label: g.guide.fullName, hint: `${g.participants.length} חניכות` })),
+              ]}
+            />
           </div>
 
           {shown.length === 0 && <p className="muted center">לא נמצאה חניכה בשם הזה.</p>}
@@ -94,10 +97,10 @@ export function BranchParticipants() {
                   </div>
                   <div className="guide-group-actions">
                     <button className="btn btn-ghost btn-small" onClick={() => setEditing({ guideId: g.guide.id })}>
-                      ＋ חניכה לקבוצה
+                      <Icon name="plus" size={15} /> חניכה לקבוצה
                     </button>
                     <Link to={`/guides/${g.guide.id}`} className="btn btn-ghost btn-small">
-                      לדף המדריכה ←
+                      לדף המדריכה <Icon name="arrowLeft" size={15} />
                     </Link>
                   </div>
                 </div>

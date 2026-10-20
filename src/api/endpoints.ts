@@ -22,7 +22,6 @@ import type {
 export interface PersonInput {
   fullName: string
   phone: string
-  nationalId: string
 }
 
 // Auth
@@ -63,6 +62,7 @@ export const deleteParticipant = (id: number) => api<void>(`/api/participants/${
 // Meetings
 export interface MeetingFilter {
   userId?: number
+  guidesOnly?: boolean
   type?: MeetingType | ''
   from?: string
   to?: string
@@ -72,7 +72,7 @@ export interface MeetingFilter {
 }
 
 export const getMeetings = (filter: MeetingFilter) =>
-  api<PagedResult<MeetingListItemDto>>(`/api/meetings${query({ ...filter })}`)
+  api<PagedResult<MeetingListItemDto>>(`/api/meetings${query({ ...filter, guidesOnly: filter.guidesOnly ? 'true' : undefined })}`)
 
 export const getMeeting = (id: number) => api<MeetingDto>(`/api/meetings/${id}`)
 

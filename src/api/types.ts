@@ -19,7 +19,6 @@ export interface UserDto {
   email: string
   fullName: string
   phone: string
-  nationalId: string
   role: UserRole
   createdAt: string
 }
@@ -27,7 +26,6 @@ export interface UserDto {
 export interface ParticipantDto {
   id: number
   fullName: string
-  nationalId: string
   phone: string
   guideId: number
 }
@@ -68,6 +66,7 @@ export interface MeetingListItemDto {
   date: string
   type: MeetingType
   program: string
+  equipmentName?: string | null
   participantCount: number
   totalExpenses: number
 }
@@ -87,9 +86,19 @@ export interface MeetingDto {
   type: MeetingType
   program: string
   notes?: string | null
+  equipmentId?: number | null
+  equipmentName?: string | null
   totalExpenses: number
   expenses: ExpenseDto[]
   participants: ParticipantDto[]
+  guides: MeetingGuideDto[]
+}
+
+// A guide who attended a guides meeting
+export interface MeetingGuideDto {
+  id: number
+  fullName: string
+  phone: string
 }
 
 export interface ExpenseInput {
@@ -102,7 +111,9 @@ export interface MeetingInput {
   date: string
   program: string
   notes?: string
+  equipmentId?: number | null
   participantIds: number[]
+  guideIds: number[]
   expenses: ExpenseInput[]
   allowBirthdayDraw: boolean
 }
